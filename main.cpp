@@ -1,8 +1,9 @@
 #include "argc/argc.h"
 
 int main(int argc, char* argv[]) {
-    Argc arg{};
-    arg.parse(argc, argv);
-    //argv_parse(argc, argv);
-    return 0;
+    arg::Argc arg{};
+    if (arg.parse(argc, argv) != 0) {
+        return EXIT_FAILURE;
+    }
+    return EXIT_SUCCESS;
 }
