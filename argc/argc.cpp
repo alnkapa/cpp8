@@ -20,7 +20,7 @@ namespace arg {
         )
         (
             "directory,d", 
-            po::value<std::vector<std::string>>(&directory)->required(),
+            po::value<std::vector<std::string>>(&directory),
             "input directory (for multiples input use -d dir1 -d dir2 -d dir3 ...)"
         )
         (
