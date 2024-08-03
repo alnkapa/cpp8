@@ -59,32 +59,32 @@ namespace arg {
             po::store(po::parse_command_line(argc, argv, desc), vm);
             po::notify(vm);
             if (vm.count("help")) {
-                std::cout << desc << std::endl;
+                std::cout << desc << "\n";
                 return -2;
             }
         } catch (const po::required_option& e) {
-            std::cerr << "Error: " << e.what() << std::endl;
-            std::cerr << desc << std::endl;
+            std::cerr << "Error: " << e.what() << "\n";
+            std::cerr << desc << "\n";
             return -1;
         } catch (const po::error& e) {
-            std::cerr << "Error: " << e.what() << std::endl;
-            std::cerr << desc << std::endl;
+            std::cerr << "Error: " << e.what() << "\n";
+            std::cerr << desc << "\n";
             return -1;
         }
         // Выводим значения аргументов
         std::cout << "Input directories: ";
         std::copy(directory.begin(), directory.end(), std::ostream_iterator<std::string>(std::cout, " "));
-        std::cout << std::endl;
+        std::cout << "\n";
         if (!directory_exception.empty()) {
             std::cout << "Exception directories: ";
             std::copy(directory_exception.begin(), directory_exception.end(),
                       std::ostream_iterator<std::string>(std::cout, " "));
         }
-        std::cout << std::endl;
-        std::cout << "Level: " << deep_level << std::endl;
-        std::cout << "Size: " << file_size << std::endl;
-        std::cout << "Block size: " << block_size << std::endl;
-        std::cout << "Hash algorithm: " << boost::lexical_cast<std::string>(hashes) << std::endl;
+        std::cout << "\n";
+        std::cout << "Level: " << deep_level << "\n";
+        std::cout << "Size: " << file_size << "\n";
+        std::cout << "Block size: " << block_size << "\n";
+        std::cout << "Hash algorithm: " << boost::lexical_cast<std::string>(hashes) << "\n";
         return 0;
     };
 };  // namespace arg
