@@ -2,12 +2,14 @@ cmake_minimum_required(VERSION 3.25.1)
 
 project(Bayan VERSION 0.0.1)
 
-add_executable(bayan main_recursion.cpp)
+add_executable(bayan main.cpp)
 
-target_include_directories(
+add_subdirectory(argc)
+
+target_link_libraries(
     bayan
     PRIVATE
-    ${CMAKE_CURRENT_BINARY_DIR}
+    argc
 )
 
 set_target_properties(bayan PROPERTIES
@@ -16,16 +18,3 @@ set_target_properties(bayan PROPERTIES
 )
 
 set(CMAKE_BUILD_TYPE Debug)
-
-# install(
-#     TARGETS bulk
-#     COMPONENT ${PROJECT_NAME}
-#     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} # bin
-# )
-# SET(CPACK_GENERATOR "DEB")
-# SET(CPACK_PACKAGE_VERSION_MAJOR ${PROJECT_VERSION_MAJOR}) 
-# SET(CPACK_PACKAGE_VERSION_MINOR ${PROJECT_VERSION_MINOR}) 
-# SET(CPACK_PACKAGE_VERSION_PATCH ${PROJECT_VERSION_PATCH}) 
-# SET(CPACK_PACKAGE_NAME ${CMAKE_PROJECT_NAME})
-# SET(CPACK_PACKAGE_CONTACT "my")
-# INCLUDE(CPack)
