@@ -8,17 +8,15 @@
 using DirectoryException = std::unordered_set<std::string>;
 struct proccess {
     arg::Argc arg;
-    void file_finder(const std::string &path, std::shared_ptr<DirectoryException> directory_exception) {
+    void file_finder(const std::string& path, std::shared_ptr<DirectoryException> directory_exception) {
         namespace fs = std::filesystem;
         fs::path dir(path);
         for (auto it = fs::recursive_directory_iterator(dir); it != fs::recursive_directory_iterator(); ++it) {
-            if (it.depth() + 1 > arg.deep_level) {
-                it.disable_recursion_pending();
-            }
             if (it->is_directory()) {
-                if (directory_exception->contains(it->path().filename())) {
+                if (it.depth() + 1 > arg.deep_level) {
                     it.disable_recursion_pending();
-                    continue;
+                } else if (directory_exception->contains(it->path().filename())) {
+                    it.disable_recursion_pending();
                 }
             } else if (it->is_regular_file()) {
                 std::cout << it.depth() << " : " << *it << "\n";
