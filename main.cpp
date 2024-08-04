@@ -17,6 +17,24 @@ std::size_t get_block_number(std::uintmax_t file_size, std::size_t block_size) {
     return block_number;
 }
 
+std::size_t get_block_hash(const std::string& path, std::uintmax_t file_size, std::size_t block_index,
+                           std::size_t block_size) {
+    std::fstream my_file(path, std::ios::in | std::ios::binary);
+    if (!my_file) {
+        throw(std::ios_base::failure("can`t open file: " + path));
+    }
+    char buf[block_size]{};
+    my_file.seekg(block_index * block_size);
+    std::cout << my_file.tellg() << " " << block_index * block_size << " : ";
+    auto size = my_file.read(reinterpret_cast<char*>(&buf), block_size).gcount();
+    
+    std::cout << size << " ";
+    my_file.close();
+
+    // Do hash
+    return {0};
+}
+
 template <typename T>
 class Block {
    private:
@@ -59,27 +77,16 @@ struct proccess {
                 std::cout << "depth:" << it.depth() << " filename :" << it->path().filename() << "\n";
                 auto block_number = get_block_number(it->file_size(), arg.block_size);
                 std::cout << "block_number:" << block_number << " file_size:" << it->file_size() << "\n";
-                std::fstream my_file(it->path());
-                if (!my_file) {
-                    std::cout << "can`t open file:" << it->path();
-                }
-                std::uint8_t buf[arg.block_size]{};
                 std::cout << "read siZe: ";
                 for (auto i = 0; i < block_number; ++i) {
                     try {
-                        my_file.seekg(i * arg.block_size);
-                        std::cout << my_file.tellg() << " " << i * arg.block_size << " : ";
-                        my_file.read(reinterpret_cast<char*>(&buf), arg.block_size);
-                        std::cout << my_file.gcount() << " ";
+                        get_block_hash(it->path(), it->file_size(), i, arg.block_size);
                     } catch (const std::exception& ex) {
-                        break;
-                        std::cout << "what():  " << ex.what() << '\n';                    
+                        std::cout << "what():  " << ex.what() << '\n';
                     }
-                    // Do hash
-                }
+                };
                 std::cout << '\n';
-                my_file.close();
-                //std::terminate();
+                // std::terminate();
             }
         };
     }
