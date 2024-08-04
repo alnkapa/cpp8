@@ -45,7 +45,7 @@ namespace arg {
         )
         (
             "bsize,S", 
-            po::value<std::size_t>(&block_size)->default_value(1), 
+            po::value<std::size_t>(&block_size)->default_value(80), 
             "block size"
         )
         (
