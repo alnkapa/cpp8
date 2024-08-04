@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <filesystem>
 #include <memory>
 #include <unordered_set>
@@ -5,37 +6,48 @@
 #include "argc/argc.h"
 
 using DirectoryException = std::unordered_set<std::string>;
-
-// file_finder
-// deep_level - глубина рекурсии
-// directory_exception - директории для исключения из сканирования
-int file_finder(std::shared_ptr<DirectoryException> directory_exception, int deep_level) {
-    namespace fs = std::filesystem;
-    fs::path dir("CMakeFiles");
-    if (!fs::exists(dir) || !fs::is_directory(dir)) {
-        return -1;
+struct proccess {
+    arg::Argc arg;
+    void file_finder(const std::string &path, std::shared_ptr<DirectoryException> directory_exception) {
+        namespace fs = std::filesystem;
+        fs::path dir(path);
+        for (auto it = fs::recursive_directory_iterator(dir); it != fs::recursive_directory_iterator(); ++it) {
+            if (it.depth() + 1 > arg.deep_level) {
+                it.disable_recursion_pending();
+            }
+            if (it->is_directory()) {
+                if (directory_exception->contains(it->path().filename())) {
+                    it.disable_recursion_pending();
+                    continue;
+                }
+            } else if (it->is_regular_file()) {
+                std::cout << it.depth() << " : " << *it << "\n";
+                std::cout << " Directory : " << it->path().root_directory() << "\n"
+                          << "root_name :" << it->path().root_name() << "\n"
+                          << "root_path :" << it->path().root_path() << "\n"
+                          << "relative_path :" << it->path().relative_path() << "\n"
+                          << "parent_path :" << it->path().parent_path() << "\n"
+                          << "filename :" << it->path().filename() << "\n"
+                          << "stem :" << it->path().stem() << "\n"
+                          << "extension :" << it->path().extension() << "\n"
+                          << "\n";
+            }
+        };
     }
-    for (auto it = fs::recursive_directory_iterator(dir); it != fs::recursive_directory_iterator(); ++it) {
-        if (it.depth() + 1 > deep_level) {
-            it.disable_recursion_pending();
-        }        
-        std::cout << it.depth() << *it << "\n";
-        // if (fs::is_regular_file(entry)) {
-        //     std::cout << "Найден файл: " << entry.path() << std::endl;
-        // }
-    }
-    return 0;
-}
-
+};
 int main(int argc, char* argv[]) {
-    arg::Argc arg{};
-    if (arg.parse(argc, argv) != 0) {
+    proccess p{};
+    if (p.arg.parse(argc, argv) != 0) {
         return EXIT_FAILURE;
     }
     auto dir_except = std::make_shared<DirectoryException>();
-    for (const auto &v: arg.directory_exception) {        
-    };
-    file_finder(dir_except, arg.deep_level);
-
+    std::ranges::for_each(p.arg.directory_exception, [&dir_except](const std::string& v) { dir_except->insert(v); });
+    std::ranges::for_each(p.arg.directory, [&dir_except, &p](const std::string& v) {
+        try {
+            p.file_finder(v, dir_except);
+        } catch (std::filesystem::filesystem_error const& ex) {
+            std::cout << "what():  " << ex.what() << '\n';
+        };
+    });
     return EXIT_SUCCESS;
 }
