@@ -16,21 +16,24 @@ std::size_t get_block_number(std::uintmax_t file_size, std::size_t block_size) {
     }
     return block_number;
 }
+// TODO:  привязать к std::unique_ptr
+void close_file(std::fstream* ptr) {
+    if (ptr != nullptr) ptr->close();
+};
 
 std::size_t get_block_hash(const std::string& path, std::uintmax_t file_size, std::size_t block_index,
                            std::size_t block_size) {
-    std::fstream my_file(path, std::ios::in | std::ios::binary);
-    if (!my_file) {
+    std::unique_ptr<std::fstream, decltype(&close_file)> file_ptr(
+        new std::fstream(path, std::ios::in | std::ios::binary), &close_file);
+    if (!file_ptr->get()) {
         throw(std::ios_base::failure("can`t open file: " + path));
     }
     char buf[block_size]{};
-    my_file.seekg(block_index * block_size);
-    std::cout << my_file.tellg() << " " << block_index * block_size << " : ";
-    auto size = my_file.read(reinterpret_cast<char*>(&buf), block_size).gcount();
-    
+    file_ptr->seekg(block_index * block_size);
+    std::cout << file_ptr->tellg() << " " << block_index * block_size << " : ";
+    auto size = file_ptr->read(reinterpret_cast<char*>(&buf), block_size).gcount();
     std::cout << size << " ";
-    my_file.close();
-
+    
     // Do hash
     return {0};
 }
@@ -44,7 +47,7 @@ class Block {
     T m_hash;                    // хеш
    public:
     Block(const std::string& path, const std::size_t& index, std::uintmax_t file_size, const T& hash)
-        : m_path(path), m_index(index), m_file_size(file_size), m_hash(hash){};
+        : m_path(path), m_index(index), m_file_size(file_size), m_hash(hash) {};
     std::size_t index() { return m_index; };
     T hash() {
         if (m_hash.size() == 0) {
@@ -52,7 +55,6 @@ class Block {
             if (!my_file) {
                 throw(std::filesystem::filesystem_error("can`t open file", std::filesystem::path(m_path)));
             }
-            my_file.close();
             return m_hash;
         } else {
             return m_hash;
