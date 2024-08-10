@@ -2,22 +2,22 @@ cmake_minimum_required(VERSION 3.25.1)
 
 
 add_library(
-    hash 
+    hashing 
     STATIC    
-    hash.cpp 
     hash.h
+    hash.cpp
 )
 
 target_include_directories(
-    hash 
+    hashing 
     PUBLIC
     ${CMAKE_SOURCE_DIR}
 )
 
-find_package(Boost REQUIRED COMPONENTS program_options)
-target_link_libraries(
-    hash
-    PRIVATE
-    Boost::program_options
-)
+find_package(OpenSSL REQUIRED)
 
+target_link_libraries(
+    hashing
+    PRIVATE
+    OpenSSL::SSL OpenSSL::Crypto
+)

@@ -7,6 +7,7 @@
 #include <unordered_set>
 
 #include "argc/argc.h"
+#include "hashing/hash.h"
 using namespace boost::multi_index;
 
 std::size_t get_block_number(std::uintmax_t file_size, std::size_t block_size) {
@@ -18,22 +19,24 @@ std::size_t get_block_number(std::uintmax_t file_size, std::size_t block_size) {
 }
 // TODO:  привязать к std::unique_ptr
 void close_file(std::fstream* ptr) {
-    if (ptr != nullptr) ptr->close();
+    if (ptr->is_open()) ptr->close();
 };
 
 std::size_t get_block_hash(const std::string& path, std::uintmax_t file_size, std::size_t block_index,
                            std::size_t block_size) {
     std::unique_ptr<std::fstream, decltype(&close_file)> file_ptr(
         new std::fstream(path, std::ios::in | std::ios::binary), &close_file);
-    if (!file_ptr->get()) {
+    if (!file_ptr->is_open()) {
         throw(std::ios_base::failure("can`t open file: " + path));
     }
+    auto h = Hash::createHash(HashAlgorithm::MD5);
     char buf[block_size]{};
     file_ptr->seekg(block_index * block_size);
     std::cout << file_ptr->tellg() << " " << block_index * block_size << " : ";
     auto size = file_ptr->read(reinterpret_cast<char*>(&buf), block_size).gcount();
     std::cout << size << " ";
-    
+    h->hash(buf);
+
     // Do hash
     return {0};
 }
@@ -47,7 +50,7 @@ class Block {
     T m_hash;                    // хеш
    public:
     Block(const std::string& path, const std::size_t& index, std::uintmax_t file_size, const T& hash)
-        : m_path(path), m_index(index), m_file_size(file_size), m_hash(hash) {};
+        : m_path(path), m_index(index), m_file_size(file_size), m_hash(hash){};
     std::size_t index() { return m_index; };
     T hash() {
         if (m_hash.size() == 0) {
@@ -88,7 +91,7 @@ struct proccess {
                     }
                 };
                 std::cout << '\n';
-                // std::terminate();
+                std::terminate();
             }
         };
     }
