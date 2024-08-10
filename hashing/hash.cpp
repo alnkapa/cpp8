@@ -51,6 +51,7 @@ HashType Hash::hash(const HashType& in) {
     if (EVP_DigestFinal_ex(context.get(), m_value, &m_len) != 1) {
         throw std::runtime_error("Failed to finalize digest");
     }
+
     return {reinterpret_cast<const char*>(&m_value), std::size_t(m_len)};
 }
 
