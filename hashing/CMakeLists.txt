@@ -19,5 +19,6 @@ find_package(OpenSSL REQUIRED)
 target_link_libraries(
     hashing
     PRIVATE
-    OpenSSL::SSL OpenSSL::Crypto
+    OpenSSL::SSL 
+    OpenSSL::Crypto
 )
