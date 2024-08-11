@@ -34,10 +34,10 @@ std::size_t Block::get_block_number() {
     return {reinterpret_cast<const char*>(&buf), std::size_t(size)};
 }
 
-void Block::get_block_hash(const ::hash::HashType& in) { m_hash_value = std::move(m_hash.get()->hash(in)); }
+void Block::get_block_hash(const ::hash::HashType& in) { m_hash_value = std::move(m_hash_function.get()->hash(in)); }
 
 Block::Block(const std::string& path, const std::size_t& index, const std::uintmax_t& file_size,
              const std::size_t& block_size, std::unique_ptr<::hash::Hash> hash)
-    : m_path(path), m_block_index{index}, m_file_size(file_size), m_block_size(block_size), m_hash(std::move(hash)) {
+    : m_path(path), m_block_index{index}, m_file_size(file_size), m_block_size(block_size), m_hash_function(std::move(hash)) {
     m_block_number = get_block_number();
 };

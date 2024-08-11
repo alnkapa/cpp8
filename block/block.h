@@ -15,7 +15,7 @@ class Block {
     std::size_t m_block_size{};     // размер блока
     hash::HashType m_hash_value{};  // хеш
     std::size_t m_block_number{};   // количество блоков
-    std::unique_ptr<::hash::Hash> m_hash;
+    std::unique_ptr<::hash::Hash> m_hash_function; // функция хеширования
     // количество блоков
     std::size_t get_block_number();
     // содержимое блока
