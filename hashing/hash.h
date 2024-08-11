@@ -29,7 +29,7 @@ namespace hash {
         // Метод для хеширования данных
         HashType hash(const HashType& in);  // TODO: final
         // Метод для получения алгоритма
-        hash::Algorithm getAlgorithm() const final;
+        hash::Algorithm getAlgorithm() const noexcept final;
     };
 
     class SHA256 final : public HashImpl {

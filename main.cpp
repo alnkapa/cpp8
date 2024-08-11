@@ -21,18 +21,15 @@ struct proccess {
                     it.disable_recursion_pending();
                 }
             } else if (it->is_regular_file() && it->file_size() >= arg.file_size) {
-                std::cout << "depth:" << it.depth() << " filename :" << it->path().filename() << "\n";
-                // auto block_number = get_block_number(it->file_size(), arg.block_size);
-                // std::cout << "block_number:" << block_number << " file_size:" << it->file_size() << "\n";
-                // std::cout << "read siZe: ";
-                //  for (auto i = 0; i < block_number; ++i) {
-                //      try {
-                //          get_block_hash(it->path(), it->file_size(), i, arg.block_size);
-                //      } catch (const std::exception& ex) {
-                //          std::cout << "what():  " << ex.what() << '\n';
-                //      }
-                //  };
-                std::cout << '\n';
+                std::cout << " filename :" << it->path().filename() << "\n";
+                // 0) если индекс пустой, записать файл в индекс и пропустить
+                // 
+                // 1) найти файл в индексе если нет, да файл уже проиндексирован пропустить
+                // 2) читаем по блочно файл
+                //  1) делаем блок
+                //  2) получаем все блоки из индекса с таким номером и таким значение хеша
+                //  3) если не одного не найден, сохранить файл в индекс и пропустить
+                // 3) если все блоки совпали, то записываем имя этого и совпавшего файла
                 // std::terminate();
             }
         };

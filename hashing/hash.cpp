@@ -56,7 +56,7 @@ namespace hash {
         return {reinterpret_cast<const char*>(&m_value), std::size_t(m_len)};
     }
 
-    hash::Algorithm HashImpl::getAlgorithm() const { return m_algorithm; }
+    hash::Algorithm HashImpl::getAlgorithm() const noexcept { return m_algorithm; }
 
     SHA256::SHA256() : HashImpl(EVP_sha256(), hash::Algorithm::SHA256){};
     MD5::MD5() : HashImpl(EVP_md5(), hash::Algorithm::MD5){};

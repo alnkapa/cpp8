@@ -9,15 +9,15 @@ using namespace boost::multi_index;
 
 class Block {
    private:
-    std::string m_path{};           // путь до файла
-    std::size_t m_block_index{};    // номер блока в файле
-    std::uintmax_t m_file_size{};   // размер файла
-    std::size_t m_block_size{};     // размер блока
-    hash::HashType m_hash_value{};  // хеш
-    std::size_t m_block_number{};   // количество блоков
-    std::unique_ptr<::hash::Hash> m_hash_function; // функция хеширования
+    std::string m_path{};                         // путь до файла
+    std::size_t m_block_index{};                  // номер блока в файле
+    std::uintmax_t m_file_size{};                 // размер файла
+    std::size_t m_block_size{};                   // размер блока
+    hash::HashType m_hash_value{};                // хеш
+    std::size_t m_block_number{};                 // количество блоков
+    std::weak_ptr<::hash::Hash> m_hash_function;  // функция хеширования
     // количество блоков
-    std::size_t get_block_number();
+    std::size_t get_block_number() noexcept;
     // содержимое блока
     ::hash::HashType get_block_contain();
     // получить хеш
@@ -25,7 +25,13 @@ class Block {
 
    public:
     Block(const std::string& path, const std::size_t& index, const std::uintmax_t& file_size,
-          const std::size_t& block_size, std::unique_ptr<::hash::Hash> hash);
+          const std::size_t& block_size, std::shared_ptr<::hash::Hash> hash);
+    // хеш блока
+    const hash::HashType& get_hash();
+    // номер блока
+    std::size_t get_index() const noexcept;
+    // путь до файла
+    const std::string& get_path() const noexcept;
 };
 
 #endif  // BLOCK_H
