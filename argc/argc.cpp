@@ -50,8 +50,8 @@ namespace arg {
         )
         (
             "hashes,H", 
-            po::value<Argc::Hashes>(&hashes)->default_value(Argc::Hashes::crc32), 
-            "hash algorithm (crc32 or md5)"
+            po::value<::hash::Algorithm>(&hashes)->default_value(::hash::Algorithm::CRC32), 
+            "hash algorithm (crc32 or md5 or sha1 or sha256)"
         );
         // clang-format on
         po::variables_map vm;
