@@ -9,6 +9,13 @@ namespace hash {
     // тип данных для хранения принимаемого и передаваемого значения
     using HashType = std::string;
 
+    class Hash {
+       public:
+        virtual HashType hash(const HashType&) = 0;
+        virtual hash::Algorithm getAlgorithm() const = 0;
+        virtual ~Hash() = 0;
+    };
+
 }  // namespace hash
 
 #endif  // GLOBAL_H

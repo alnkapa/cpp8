@@ -9,7 +9,7 @@
 
 namespace hash {
 
-    class Hash {
+    class HashImpl : public Hash {
        private:
         // хеш-функция
         const EVP_MD* m_hash;
@@ -17,30 +17,30 @@ namespace hash {
         hash::Algorithm m_algorithm;
 
        protected:
-        Hash(const EVP_MD* hash, hash::Algorithm algorithm);
+        HashImpl(const EVP_MD* hash, hash::Algorithm algorithm);
 
        public:
-        Hash(const Hash&) = delete;
-        Hash(const Hash&&) = delete;
-        Hash& operator=(const Hash&) = delete;
-        Hash& operator=(Hash&&) = delete;
-        ~Hash() = default;
-        static std::unique_ptr<Hash> Create(hash::Algorithm);
+        HashImpl(const HashImpl&) = delete;
+        HashImpl(const HashImpl&&) = delete;
+        HashImpl& operator=(const HashImpl&) = delete;
+        HashImpl& operator=(HashImpl&&) = delete;
+        ~HashImpl() = default;
+        static std::unique_ptr<HashImpl> Create(hash::Algorithm);
         // Метод для хеширования данных
-        HashType hash(const HashType& in);
+        HashType hash(const HashType& in);  // TODO: final
         // Метод для получения алгоритма
-        hash::Algorithm getAlgorithm() const;
+        hash::Algorithm getAlgorithm() const final;
     };
 
-    class SHA256 : public Hash {
+    class SHA256 final : public HashImpl {
        public:
         SHA256();
     };
-    class MD5 : public Hash {
+    class MD5 final : public HashImpl {
        public:
         MD5();
     };
-    class SHA1 : public Hash {
+    class SHA1 final : public HashImpl {
        public:
         SHA1();
     };

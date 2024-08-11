@@ -7,9 +7,9 @@
 #include <stdexcept>
 namespace hash {
 
-    Hash::Hash(const EVP_MD* hash, hash::Algorithm algorithm) : m_hash(hash), m_algorithm(algorithm){};
+    HashImpl::HashImpl(const EVP_MD* hash, hash::Algorithm algorithm) : m_hash(hash), m_algorithm(algorithm){};
 
-    std::unique_ptr<Hash> Hash::Create(hash::Algorithm in) {
+    std::unique_ptr<HashImpl> HashImpl::Create(hash::Algorithm in) {
         switch (in) {
             case hash::Algorithm::SHA256:
                 return std::make_unique<SHA256>();
@@ -22,7 +22,7 @@ namespace hash {
         }
     }
 
-    HashType Hash::hash(const HashType& in) {
+    HashType HashImpl::hash(const HashType& in) {
         // хеш-значения
         unsigned char m_value[EVP_MAX_MD_SIZE]{0};
         // хеш-длина
@@ -56,10 +56,10 @@ namespace hash {
         return {reinterpret_cast<const char*>(&m_value), std::size_t(m_len)};
     }
 
-    hash::Algorithm Hash::getAlgorithm() const { return m_algorithm; }
+    hash::Algorithm HashImpl::getAlgorithm() const { return m_algorithm; }
 
-    SHA256::SHA256() : Hash(EVP_sha256(), hash::Algorithm::SHA256){};
-    MD5::MD5() : Hash(EVP_md5(), hash::Algorithm::MD5){};
-    SHA1::SHA1() : Hash(EVP_sha1(), hash::Algorithm::SHA1){};
+    SHA256::SHA256() : HashImpl(EVP_sha256(), hash::Algorithm::SHA256){};
+    MD5::MD5() : HashImpl(EVP_md5(), hash::Algorithm::MD5){};
+    SHA1::SHA1() : HashImpl(EVP_sha1(), hash::Algorithm::SHA1){};
 
 }  // namespace hash

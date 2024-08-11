@@ -7,7 +7,7 @@
 #include "hashing/hash.h"
 
 using DirectoryException = std::unordered_set<std::string>;
-struct proccess {    
+struct proccess {
     arg::Argc arg;
     // просмотр файловой системы
     void file_finder(const std::string& path, std::shared_ptr<DirectoryException> directory_exception) {
@@ -50,7 +50,7 @@ int main(int argc, char* argv[]) {
                           [&dir_except](const std::string& v) noexcept { dir_except->insert(v); });
     dir_except->rehash(dir_except->size());
     std::ranges::for_each(p.arg.directory, [&dir_except, &p](const std::string& v) noexcept {
-        // TODO: thread
+        // TODO: thread - may be
         try {
             p.file_finder(v, dir_except);
         } catch (const std::filesystem::filesystem_error& ex) {
