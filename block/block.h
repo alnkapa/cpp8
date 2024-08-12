@@ -14,10 +14,7 @@ class Block {
     std::uintmax_t m_file_size{};                 // размер файла
     std::size_t m_block_size{};                   // размер блока
     hash::HashType m_hash_value{};                // хеш
-    std::size_t m_block_number{};                 // количество блоков
-    std::weak_ptr<::hash::Hash> m_hash_function;  // функция хеширования
-    // количество блоков
-    std::size_t get_block_number() noexcept;
+    std::weak_ptr<::hash::Hash> m_hash_function;  // функция хеширования    
     // содержимое блока
     ::hash::HashType get_block_contain();
     // получить хеш
@@ -30,6 +27,8 @@ class Block {
     const hash::HashType& get_hash();
     // номер блока
     std::size_t get_index() const noexcept;
+    // размер файла 
+    std::uintmax_t get_file_size() const noexcept;
     // путь до файла
     const std::string& get_path() const noexcept;
 };

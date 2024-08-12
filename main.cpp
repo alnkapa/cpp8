@@ -9,6 +9,13 @@
 using DirectoryException = std::unordered_set<std::string>;
 struct proccess {
     arg::Argc arg;
+    std::size_t get_block_number(const std::uintmax_t& file_size, const std::size_t& block_size) noexcept {
+        auto block_number = file_size / block_size;
+        if (file_size % block_size != 0) {
+            block_number++;
+        }
+        return block_number;
+    }
     // просмотр файловой системы
     void file_finder(const std::string& path, std::shared_ptr<DirectoryException> directory_exception) {
         namespace fs = std::filesystem;
@@ -23,7 +30,7 @@ struct proccess {
             } else if (it->is_regular_file() && it->file_size() >= arg.file_size) {
                 std::cout << " filename :" << it->path().filename() << "\n";
                 // 0) если индекс пустой, записать файл в индекс и пропустить
-                // 
+                //
                 // 1) найти файл в индексе если нет, да файл уже проиндексирован пропустить
                 // 2) читаем по блочно файл
                 //  1) делаем блок
