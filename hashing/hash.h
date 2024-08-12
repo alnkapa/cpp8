@@ -17,17 +17,14 @@ namespace hash {
         hash::Algorithm m_algorithm;
 
        protected:
-        HashImpl(const EVP_MD* hash, hash::Algorithm algorithm);
+        explicit HashImpl(hash::Algorithm algorithm);
+        explicit HashImpl(const EVP_MD* hash, hash::Algorithm algorithm);
 
        public:
-        HashImpl(const HashImpl&) = delete;
-        HashImpl(const HashImpl&&) = delete;
-        HashImpl& operator=(const HashImpl&) = delete;
-        HashImpl& operator=(HashImpl&&) = delete;
         virtual ~HashImpl();
         static std::unique_ptr<HashImpl> Create(hash::Algorithm);
         // Метод для хеширования данных
-        HashType hash(const HashType& in);  // TODO: final
+        virtual HashType hash(const HashType& in);  // TODO: final
         // Метод для получения алгоритма
         hash::Algorithm getAlgorithm() const noexcept final;
     };
@@ -43,6 +40,11 @@ namespace hash {
     class SHA1 final : public HashImpl {
        public:
         SHA1();
+    };
+    class CRC32 final : public HashImpl {
+       public:
+        CRC32();
+        HashType hash(const HashType& in);
     };
 }  // namespace hash
 

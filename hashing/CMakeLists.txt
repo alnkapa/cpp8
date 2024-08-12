@@ -6,6 +6,7 @@ add_library(
     STATIC    
     hash.h
     hash.cpp
+    crc32.cpp
 )
 
 target_include_directories(

@@ -3,9 +3,10 @@
 #include <openssl/evp.h>
 
 #include <cstdio>
-#include <memory>
 #include <stdexcept>
+
 namespace hash {
+    HashImpl::HashImpl(hash::Algorithm algorithm) : m_algorithm(algorithm) {};
 
     HashImpl::HashImpl(const EVP_MD* hash, hash::Algorithm algorithm) : m_hash(hash), m_algorithm(algorithm) {};
 
@@ -18,6 +19,8 @@ namespace hash {
             case hash::Algorithm::MD5:
                 return std::make_unique<MD5>();
             case hash::Algorithm::SHA1:
+                return std::make_unique<SHA1>();
+            case hash::Algorithm::CRC32:
                 return std::make_unique<SHA1>();
             default:
                 throw std::invalid_argument("Unknown hash type");
