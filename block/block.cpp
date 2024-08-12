@@ -36,7 +36,7 @@ void Block::get_block_hash(const ::hash::HashType& in) {
 }
 
 Block::Block(const std::string& path, const std::size_t& index, const std::uintmax_t& file_size,
-             const std::size_t& block_size, std::shared_ptr<::hash::Hash> hash)
+             const std::size_t& block_size, const std::weak_ptr<::hash::Hash>& hash)
     : m_path(path), m_block_index{index}, m_file_size(file_size), m_block_size(block_size), m_hash_function(hash) {}
 
 const hash::HashType& Block::get_hash() {
@@ -46,8 +46,26 @@ const hash::HashType& Block::get_hash() {
     return m_hash_value;
 }
 
-std::size_t Block::get_index() const noexcept { return m_block_index; }
+const std::size_t& Block::get_index() const noexcept { return m_block_index; }
 
-std::uintmax_t Block::get_file_size() const noexcept { return m_file_size; }
+std::size_t& Block::index() noexcept { return m_block_index; }
 
-const std::string& Block::get_path() const noexcept { return m_path; };
+const std::uintmax_t& Block::get_file_size() const noexcept { return m_file_size; }
+
+std::uintmax_t& Block::file_size() noexcept { return m_file_size; }
+
+const std::string& Block::get_path() const noexcept { return m_path; }
+
+std::string& Block::path() noexcept { return m_path; };
+
+bool operator!=(Block& lhs, Block& rhs) { return !(lhs == rhs); }
+
+bool operator==(Block& lhs, Block& rhs) {
+    if (lhs.m_block_index != rhs.m_block_index) {
+        return false;
+    }
+    if (lhs.m_path != rhs.m_path) {
+        return false;
+    }    
+    return lhs.get_hash() != rhs.get_hash();
+}

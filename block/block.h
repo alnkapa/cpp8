@@ -18,16 +18,25 @@ class Block {
     void get_block_hash(const ::hash::HashType& in);
 
    public:
-    Block(const std::string& path, const std::size_t& index, const std::uintmax_t& file_size,
-          const std::size_t& block_size, std::shared_ptr<::hash::Hash> hash);
+    explicit Block(const std::string& path, const std::size_t& index, const std::uintmax_t& file_size,
+                   const std::size_t& block_size, const std::weak_ptr<::hash::Hash>& hash);
     // хеш блока
     const hash::HashType& get_hash();
     // номер блока
-    std::size_t get_index() const noexcept;
+    const std::size_t& get_index() const noexcept;
+    // номер блока
+    std::size_t& index() noexcept;
     // размер файла
-    std::uintmax_t get_file_size() const noexcept;
+    const std::uintmax_t& get_file_size() const noexcept;
+    // размер файла
+    std::uintmax_t& file_size() noexcept;
     // путь до файла
     const std::string& get_path() const noexcept;
+    // путь до файла
+    std::string& path() noexcept;
+
+    friend bool operator==(Block& lhs, Block& rhs);
+    friend bool operator!=(Block& lhs, Block& rhs);
 };
 
 #endif  // BLOCK_H
