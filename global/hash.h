@@ -13,9 +13,8 @@ namespace hash {
        public:
         virtual HashType hash(const HashType&) = 0;
         virtual hash::Algorithm getAlgorithm() const = 0;
-        virtual ~Hash() = 0;
+        virtual ~Hash() {};
     };
-
 }  // namespace hash
 
 #endif  // GLOBAL_H

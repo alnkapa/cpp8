@@ -1,11 +1,8 @@
 #ifndef BLOCK_H
 #define BLOCK_H
-#include <boost/multi_index_container.hpp>
 #include <memory>
 
 #include "../global/hash.h"
-
-using namespace boost::multi_index;
 
 class Block {
    private:
@@ -14,7 +11,7 @@ class Block {
     std::uintmax_t m_file_size{};                 // размер файла
     std::size_t m_block_size{};                   // размер блока
     hash::HashType m_hash_value{};                // хеш
-    std::weak_ptr<::hash::Hash> m_hash_function;  // функция хеширования    
+    std::weak_ptr<::hash::Hash> m_hash_function;  // функция хеширования
     // содержимое блока
     ::hash::HashType get_block_contain();
     // получить хеш
@@ -27,7 +24,7 @@ class Block {
     const hash::HashType& get_hash();
     // номер блока
     std::size_t get_index() const noexcept;
-    // размер файла 
+    // размер файла
     std::uintmax_t get_file_size() const noexcept;
     // путь до файла
     const std::string& get_path() const noexcept;

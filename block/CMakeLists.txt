@@ -13,9 +13,3 @@ target_include_directories(
     PUBLIC
     ${CMAKE_SOURCE_DIR}
 )
-
-# target_link_libraries(
-#     argc
-#     PRIVATE
-#     Boost::boost_multi_index
-# )

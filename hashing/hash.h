@@ -24,7 +24,7 @@ namespace hash {
         HashImpl(const HashImpl&&) = delete;
         HashImpl& operator=(const HashImpl&) = delete;
         HashImpl& operator=(HashImpl&&) = delete;
-        ~HashImpl() = default;
+        virtual ~HashImpl();
         static std::unique_ptr<HashImpl> Create(hash::Algorithm);
         // Метод для хеширования данных
         HashType hash(const HashType& in);  // TODO: final

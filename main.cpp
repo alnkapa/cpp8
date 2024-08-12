@@ -1,3 +1,4 @@
+#include <boost/multi_index_container.hpp>
 #include <filesystem>
 #include <memory>
 #include <unordered_set>
@@ -6,8 +7,10 @@
 #include "global/hash.h"
 #include "hashing/hash.h"
 
+using namespace boost::multi_index;
 using DirectoryException = std::unordered_set<std::string>;
 struct proccess {
+    std::unique_ptr<::hash::Hash> hash_function;
     arg::Argc arg;
     std::size_t get_block_number(const std::uintmax_t& file_size, const std::size_t& block_size) noexcept {
         auto block_number = file_size / block_size;
@@ -48,6 +51,8 @@ int main(int argc, char* argv[]) {
     if (p.arg.parse(argc, argv) != 0) {
         return EXIT_FAILURE;
     }
+    p.hash_function = hash::HashImpl::Create(p.arg.hashes);
+    
     p.arg.directory.emplace_back("CMakeFiles");
     auto dir_except = std::make_shared<DirectoryException>();
     std::ranges::for_each(p.arg.directory_exception,

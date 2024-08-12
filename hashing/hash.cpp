@@ -7,7 +7,9 @@
 #include <stdexcept>
 namespace hash {
 
-    HashImpl::HashImpl(const EVP_MD* hash, hash::Algorithm algorithm) : m_hash(hash), m_algorithm(algorithm){};
+    HashImpl::HashImpl(const EVP_MD* hash, hash::Algorithm algorithm) : m_hash(hash), m_algorithm(algorithm) {};
+
+    HashImpl::~HashImpl() {}
 
     std::unique_ptr<HashImpl> HashImpl::Create(hash::Algorithm in) {
         switch (in) {
@@ -58,8 +60,8 @@ namespace hash {
 
     hash::Algorithm HashImpl::getAlgorithm() const noexcept { return m_algorithm; }
 
-    SHA256::SHA256() : HashImpl(EVP_sha256(), hash::Algorithm::SHA256){};
-    MD5::MD5() : HashImpl(EVP_md5(), hash::Algorithm::MD5){};
-    SHA1::SHA1() : HashImpl(EVP_sha1(), hash::Algorithm::SHA1){};
+    SHA256::SHA256() : HashImpl(EVP_sha256(), hash::Algorithm::SHA256) {}
+    MD5::MD5() : HashImpl(EVP_md5(), hash::Algorithm::MD5) {};
+    SHA1::SHA1() : HashImpl(EVP_sha1(), hash::Algorithm::SHA1) {};
 
 }  // namespace hash
