@@ -5,23 +5,14 @@
 #include <stdexcept>
 #include <utility>
 
-// закрыть файл
-void close_file(std::fstream* ptr) {
-    if (ptr->is_open()) ptr->close();
-};
-
 ::hash::HashType Block::get_block_contain() {
-    std::unique_ptr<std::fstream, decltype(&close_file)> file_ptr(
-        new std::fstream(m_path, std::ios::in | std::ios::binary), &close_file);
-    if (!file_ptr->is_open()) {
-        throw(std::ios_base::failure("can`t open file: " + m_path));
-    }
+    auto file = std::fstream(m_path, std::ios::in | std::ios::binary);
     char buf[m_block_size]{};
-    file_ptr->seekg(m_block_index * m_block_size);
-    std::cout << file_ptr->tellg() << " " << m_block_index * m_block_size << " : ";
-    auto size = file_ptr->read(reinterpret_cast<char*>(&buf), m_block_size).gcount();
+    file.seekg(m_block_index * m_block_size);
+    std::cout << file.tellg() << " " << m_block_index * m_block_size << " : ";
+    auto size = file.read(reinterpret_cast<char*>(&buf), m_block_size).gcount();
     if (size == 0 || size > m_block_size) {
-        throw(std::ios_base::failure("block size mismatch: " + size));
+        throw(std::length_error("block size mismatch: " + size));
     }
     std::cout << size << " ";
     return {reinterpret_cast<const char*>(&buf), std::size_t(size)};
@@ -66,6 +57,6 @@ bool operator==(Block& lhs, Block& rhs) {
     }
     if (lhs.m_path != rhs.m_path) {
         return false;
-    }    
+    }
     return lhs.get_hash() != rhs.get_hash();
 }
