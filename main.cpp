@@ -1,7 +1,4 @@
-#include <boost/lambda/lambda.hpp>
-#include <boost/multi_index/composite_key.hpp>
 #include <boost/multi_index/hashed_index.hpp>
-#include <boost/multi_index/sequenced_index.hpp>
 #include <boost/multi_index/key.hpp>
 #include <boost/multi_index/ordered_index.hpp>
 #include <boost/multi_index_container.hpp>
@@ -11,43 +8,30 @@
 #include <unordered_set>
 
 #include "argc/argc.h"
-#include "block/block.h"
+#include "files/files.h"
 #include "global/hash.h"
 #include "hashing/hash.h"
 
-using namespace boost::lambda;
 using namespace boost::multi_index;
 using DirectoryException = std::unordered_set<std::string>;
 
 struct file_extractor {
     typedef std::string result_type;
-    const result_type& operator()(const Block& e) const { return e.get_path(); }
-    result_type& operator()(Block* e) const { return e->path(); }
+    const result_type& operator()(const files::File& e) const { return e.get_path(); }
+    result_type& operator()(files::File* e) const { return e->path(); }
 };
-struct block_extractor {
-    typedef std::size_t result_type;
-    const result_type& operator()(const Block& e) const { return e.get_index(); }
-    result_type& operator()(Block* e) const { return e->index(); }
-};
+
 struct file_size_extractor {
     typedef std::uintmax_t result_type;
-    const result_type& operator()(const Block& e) const { return e.get_file_size(); }
-    result_type& operator()(Block* e) const { return e->file_size(); }
+    const result_type& operator()(const files::File& e) const { return e.get_file_size(); }
+    result_type& operator()(files::File* e) const { return e->file_size(); }
 };
 // clang-format off
 typedef multi_index_container<
-  Block,
+  files::File,
   indexed_by<
-    // sequenced<>
     hashed_unique<file_extractor>, // поиск файла 
-    ordered_non_unique<file_size_extractor>, // поиск размера 
-    hashed_unique<
-        composite_key<
-            Block,
-            block_extractor,
-            file_extractor
-        >
-    > // поиск блока     
+    ordered_non_unique<file_size_extractor> // поиск размера     
   >
 > container;
 
@@ -65,11 +49,9 @@ struct proccess {
         return block_number;
     }
 
-    void add_to_index(const std::string& file_name, std::uintmax_t file_size, std::size_t block_number) {
+    void add_to_index(const std::string& file_name, std::uintmax_t file_size, std::size_t block_numbers) {
         std::cout << "IN: File: " << file_name << ", Size: " << file_size << "\n";
-        for (auto b_num = 0; b_num < block_number; ++b_num) {
-            index.emplace(file_name, b_num, file_size, arg.block_size, hash_function);
-        }
+        index.emplace(file_name, file_size, arg.block_size, block_numbers, hash_function);
     }
 
     // просмотр файловой системы
@@ -78,7 +60,6 @@ struct proccess {
         fs::path dir(path);
         auto& file_index = index.get<0>();
         auto& file_size_index = index.get<1>();
-        auto& block_file_index = index.get<2>();
         container::iterator p;
         for (auto dir_it = fs::recursive_directory_iterator(dir); dir_it != fs::recursive_directory_iterator();
              ++dir_it) {
@@ -106,36 +87,38 @@ struct proccess {
                     continue;
                 }
                 std::cout << "COMP: File: " << dir_it->path() << ", Size: " << dir_it->file_size() << "\n";
+                files::BlockVector blocks{block_number};
                 // по блочное сравнение
                 for (std::size_t b_num = 0; b_num < block_number; ++b_num) {
                     std::cout << "BLOCK: " << b_num << "\n";
-                    Block new_bl{dir_it->path(), b_num, dir_it->file_size(), block_number, hash_function};
-                    for (auto file_size_it = file_size_range_it.first; file_size_it != file_size_range_it.second;
-                         ++file_size_it) {
-                        std::cout << "FIND: File: " << file_size_it->get_path() << "\n";
-                        if (auto block_file_it =
-                                block_file_index.find(std::make_tuple(b_num, file_size_it->get_path()));
-                            block_file_it != block_file_index.end()) {
-                            std::cout << "FIND: File: " << block_file_it->get_path()
-                                      << " FIND: Block: " << block_file_it->get_index() << "\n";
-                            // // получить имя файла
-                            // auto block_it = index.project<0>(file_size_it);
-                            // std::cout << "FIND: File: " << block_it->get_path()
-                            //           << ", Size: " << block_it->get_file_size()
-                            //           << " , Block: " << block_it->get_index() << "\n";
-                            // // найти блок
-                            // auto f_bl = *file_size_it;
-                            // std::cout << "FIND: File: " << file_size_it->get_path()
-                            //           << ", Size: " << file_size_it->get_file_size()
-                            //           << " , Block: " << file_size_it->get_index() << "\n";
-                            // if (f_bl == new_bl) {
-                            //     std::cout << "FIND: File: " << f_bl.get_path() << ", Block: " << f_bl.get_index()
-                            //               << "\n";
-                            // } else {
-                            //     continue;
-                            // }
-                        }
-                    }
+
+                    // File new_bl{dir_it->path(), b_num, dir_it->file_size(), block_number, hash_function};
+                    // for (auto file_size_it = file_size_range_it.first; file_size_it != file_size_range_it.second;
+                    //      ++file_size_it) {
+                    //     std::cout << "FIND: File: " << file_size_it->get_path() << "\n";
+                    //     if (auto block_file_it =
+                    //             block_file_index.find(std::make_tuple(b_num, file_size_it->get_path()));
+                    //         block_file_it != block_file_index.end()) {
+                    //         std::cout << "FIND: File: " << block_file_it->get_path()
+                    //                   << " FIND: Block: " << block_file_it->get_index() << "\n";
+                    //         // // получить имя файла
+                    //         // auto block_it = index.project<0>(file_size_it);
+                    //         // std::cout << "FIND: File: " << block_it->get_path()
+                    //         //           << ", Size: " << block_it->get_file_size()
+                    //         //           << " , Block: " << block_it->get_index() << "\n";
+                    //         // // найти блок
+                    //         // auto f_bl = *file_size_it;
+                    //         // std::cout << "FIND: File: " << file_size_it->get_path()
+                    //         //           << ", Size: " << file_size_it->get_file_size()
+                    //         //           << " , Block: " << file_size_it->get_index() << "\n";
+                    //         // if (f_bl == new_bl) {
+                    //         //     std::cout << "FIND: File: " << f_bl.get_path() << ", Block: " << f_bl.get_index()
+                    //         //               << "\n";
+                    //         // } else {
+                    //         //     continue;
+                    //         // }
+                    //     }
+                    // }
                     if (b_num == 2) {
                         std::terminate();
                     }

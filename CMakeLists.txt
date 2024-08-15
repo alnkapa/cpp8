@@ -6,14 +6,14 @@ add_executable(bayan main.cpp)
 
 add_subdirectory(argc)
 add_subdirectory(hashing)
-add_subdirectory(block)
+add_subdirectory(files)
 
 target_link_libraries(
     bayan
     PRIVATE
     argc
     hashing
-    block
+    files
 )
 
 set_target_properties(bayan PROPERTIES

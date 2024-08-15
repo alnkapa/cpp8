@@ -2,14 +2,14 @@ cmake_minimum_required(VERSION 3.25.1)
 
 
 add_library(
-    block 
+    files 
     STATIC    
-    block.h
-    block.cpp
+    files.h
+    files.cpp
 )
 
 target_include_directories(
-    block 
+    files 
     PUBLIC
     ${CMAKE_SOURCE_DIR}
 )
