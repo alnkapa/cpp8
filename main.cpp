@@ -3,6 +3,7 @@
 #include <boost/multi_index/ordered_index.hpp>
 #include <boost/multi_index_container.hpp>
 #include <filesystem>
+#include <fstream>
 #include <memory>
 #include <tuple>
 #include <unordered_set>
@@ -48,10 +49,22 @@ struct proccess {
         }
         return block_number;
     }
+    ::hash::HashType get_block_hash(const std::string& path, const size_t block_index, const size_t block_size) {
+        auto file = std::fstream(path, std::ios::in | std::ios::binary);
+        char buf[block_size]{};
+        file.seekg(block_index * block_size);
+        std::cout << file.tellg() << " " << block_index * block_size << " : ";
+        auto size = file.read(reinterpret_cast<char*>(&buf), block_size).gcount();
+        if (size == 0 || size > block_size) {
+            throw(std::length_error("block size mismatch: " + size));
+        }
+        std::cout << size << " ";
+        return hash_function->hash({reinterpret_cast<const char*>(&buf), std::size_t(size)});
+    }
 
     void add_to_index(const std::string& file_name, std::uintmax_t file_size, std::size_t block_numbers) {
         std::cout << "IN: File: " << file_name << ", Size: " << file_size << "\n";
-        index.emplace(file_name, file_size, arg.block_size, block_numbers, hash_function);
+        index.emplace(file_name, file_size, arg.block_size, block_numbers);
     }
 
     // просмотр файловой системы
@@ -91,44 +104,28 @@ struct proccess {
                 // по блочное сравнение
                 for (std::size_t b_num = 0; b_num < block_number; ++b_num) {
                     std::cout << "BLOCK: " << b_num << "\n";
-
-                    // File new_bl{dir_it->path(), b_num, dir_it->file_size(), block_number, hash_function};
-                    // for (auto file_size_it = file_size_range_it.first; file_size_it != file_size_range_it.second;
-                    //      ++file_size_it) {
-                    //     std::cout << "FIND: File: " << file_size_it->get_path() << "\n";
-                    //     if (auto block_file_it =
-                    //             block_file_index.find(std::make_tuple(b_num, file_size_it->get_path()));
-                    //         block_file_it != block_file_index.end()) {
-                    //         std::cout << "FIND: File: " << block_file_it->get_path()
-                    //                   << " FIND: Block: " << block_file_it->get_index() << "\n";
-                    //         // // получить имя файла
-                    //         // auto block_it = index.project<0>(file_size_it);
-                    //         // std::cout << "FIND: File: " << block_it->get_path()
-                    //         //           << ", Size: " << block_it->get_file_size()
-                    //         //           << " , Block: " << block_it->get_index() << "\n";
-                    //         // // найти блок
-                    //         // auto f_bl = *file_size_it;
-                    //         // std::cout << "FIND: File: " << file_size_it->get_path()
-                    //         //           << ", Size: " << file_size_it->get_file_size()
-                    //         //           << " , Block: " << file_size_it->get_index() << "\n";
-                    //         // if (f_bl == new_bl) {
-                    //         //     std::cout << "FIND: File: " << f_bl.get_path() << ", Block: " << f_bl.get_index()
-                    //         //               << "\n";
-                    //         // } else {
-                    //         //     continue;
-                    //         // }
-                    //     }
-                    // }
+                    // читаем очередной блок
+                    auto c_bb = blocks[b_num] = get_block_hash(dir_it->path(), b_num, arg.block_size);
+                    // по каждому файлу, который совпадает по размеру
+                    for (auto file_size_it = file_size_range_it.first; file_size_it != file_size_range_it.second;
+                         ++file_size_it) {
+                        std::cout << "FIND: File: " << file_size_it->get_path() << "\n";
+                        auto file_blocks = file_size_it->blocks();
+                        ::hash::HashType f_bb;
+                        try {
+                            f_bb = file_blocks.at(b_num);
+                        } catch (const std::out_of_range& ex) {
+                            f_bb = file_blocks[b_num] = get_block_hash(file_size_it->get_path(), b_num, arg.block_size);
+                        }
+                        if (f_bb != c_bb) {  // сравнение блоков
+                            // сохранить все ранее прочитанные блоки для этого файла
+                            // исключить его их дальнейшего сравнения
+                        }
+                    }
                     if (b_num == 2) {
                         std::terminate();
                     }
-                }
-                // 2) читаем по блочно файл
-                //  1) делаем блок
-                //  2) получаем все блоки из индекса с таким номером и таким значение хеша
-                //  3) если не одного не найден, сохранить файл в индекс и пропустить
-                // 3) если все блоки совпали, то записываем имя этого и совпавшего файла
-                // std::terminate();
+                }                
             }
         };
     }
