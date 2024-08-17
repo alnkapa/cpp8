@@ -1,6 +1,16 @@
-BasedOnStyle: Google
+BasedOnStyle: LLVM
 IndentWidth: 4
-TabWidth: 4
 UseTab: Never
 ColumnLimit: 120
-NamespaceIndentation: All
+AllowShortBlocksOnASingleLine: false
+AllowShortCaseLabelsOnASingleLine: false
+AllowShortFunctionsOnASingleLine: None
+BreakBeforeBraces: Allman
+SpaceBeforeParens: ControlStatements
+SpaceAfterCStyleCast: true
+SpacesInParentheses: false
+SpacesInAngles: false
+SpacesInContainerLiterals: false
+BinPackParameters: false
+BinPackArguments: false  # Отключает упаковку аргументов
+SortIncludes: false
