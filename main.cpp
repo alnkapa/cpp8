@@ -16,6 +16,23 @@
 using namespace boost::multi_index;
 using DirectoryException = std::unordered_set<std::string>;
 
+struct BlockSave
+{
+    BlockSave(const ::hash::HashType &value, const size_t index) : m_value(value), m_index(index)
+    {
+    }
+
+    void operator()(files::File &e)
+    {
+        std::cout << "operator: " << m_index << "\n";
+        e.add_block(m_value, m_index);
+    }
+
+  private:
+    size_t m_index;
+    ::hash::HashType m_value;
+};
+
 struct file_extractor
 {
     typedef std::string result_type;
@@ -143,22 +160,22 @@ struct proccess
                     // читаем очередной блок
                     auto c_bb = blocks[b_num] = get_block_hash(dir_it->path(), b_num, arg.block_size);
                     // по каждому файлу, который совпадает по размеру
-                    for (auto file_size_it = file_size_range_it.first; file_size_it != file_size_range_it.second;
+                    for (auto &file_size_it = file_size_range_it.first; file_size_it != file_size_range_it.second;
                          ++file_size_it)
                     {
                         std::cout << "FIND: File: " << file_size_it->get_path() << "\n";
                         auto file_index_it = index.project<0>(file_size_it); // Переход к file_index
                         ::hash::HashType f_bb;
-                        try
+                        if (!file_index_it->is_block(b_num))
                         {
-                            f_bb = file_size_it->blocks.at(b_num);
-                        }
-                        catch (const std::out_of_range &ex)
-                        {
+                            // загрузить очередной кусок в файл
                             f_bb = get_block_hash(file_size_it->get_path(), b_num, arg.block_size);
-                            file_index_it->blocks.emplace_back({f_bb});
+                            file_index.modify(file_index_it, BlockSave(f_bb, b_num));
                         }
-                        // file_size_it->blocks[b_num]
+                        else
+                        {
+                            f_bb = file_index_it->get_block(b_num);
+                        }                        
                         if (f_bb != c_bb)
                         { // сравнение блоков
                           // сохранить все ранее прочитанные блоки для этого файла
