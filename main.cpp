@@ -211,6 +211,10 @@ class MyData
     {
     }
 
+    MyData(const unsigned char *, std::size_t)  
+    {
+    }
+
     std::size_t size() const
     {
         return data_.size();
@@ -256,7 +260,10 @@ class MyHasher
     {
         data.size();
         data.data();
-        return data;
+        size_t block_size{10};
+        unsigned char buf[block_size]{0};
+
+        return T{&buf, block_size};
     }
 
     hash::Algorithm getAlgorithm() const

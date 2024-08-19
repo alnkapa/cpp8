@@ -14,7 +14,7 @@ enum class Algorithm
 };
 
 template <typename T>
-concept HashType = requires(T t) {
+concept HashType = std::is_constructible_v<T, const unsigned char *, std::size_t> && requires(T t) {
     {
         t.size()
     } -> std::convertible_to<std::size_t>;
