@@ -7,11 +7,11 @@
 #include <memory>
 #include <tuple>
 #include <unordered_set>
-
-//#include "argc/argc.h"
-//#include "files/files.h"
+#include <iostream>
+// #include "argc/argc.h"
+// #include "files/files.h"
 #include "global/hash.h"
-//#include "hashing/hash.h"
+// #include "hashing/hash.h"
 
 using namespace boost::multi_index;
 using DirectoryException = std::unordered_set<std::string>;
@@ -63,8 +63,8 @@ using DirectoryException = std::unordered_set<std::string>;
 // typedef multi_index_container<
 //   files::File,
 //   indexed_by<
-//     hashed_unique<file_extractor>, // поиск файла 
-//     ordered_non_unique<file_size_extractor> // поиск размера     
+//     hashed_unique<file_extractor>, // поиск файла
+//     ordered_non_unique<file_size_extractor> // поиск размера
 //   >
 // > container;
 
@@ -203,8 +203,111 @@ using DirectoryException = std::unordered_set<std::string>;
 //     }
 // };
 
+// Класс, представляющий данные
+class MyData
+{
+  public:
+    MyData(const std::string &data) : data_(data)
+    {
+    }
+
+    std::size_t size() const
+    {
+        return data_.size();
+    }
+
+    const unsigned char *data() const
+    {
+        return reinterpret_cast<const unsigned char *>(data_.data());
+    }
+
+  private:
+    std::string data_;
+};
+
+// Класс, представляющий данные
+class MyData1
+{
+  public:
+    MyData1(const std::string &data) : data_(data)
+    {
+    }
+
+    // std::size_t size() const
+    // {
+    //     return data_.size();
+    // }
+
+    const unsigned char *data() const
+    {
+        return reinterpret_cast<const unsigned char *>(data_.data());
+    }
+
+  private:
+    std::string data_;
+};
+
+template <typename T>
+    requires hash::HashType<T>
+class MyHasher
+{
+  public:
+    T hash(const T &data)
+    {
+        data.size();
+        data.data();
+        return data;
+    }
+
+    hash::Algorithm getAlgorithm() const
+    {
+        return hash::Algorithm::SHA256;
+    }
+};
+
+template <typename T>
+    requires hash::HashType<T>
+class MyHasher1
+{
+  public:
+    T hash(const T &data)
+    {
+        data.size();
+        data.data();
+        return data;
+    }
+
+    // hash::Algorithm getAlgorithm() const
+    // {
+    //     return hash::Algorithm::SHA256;
+    // }
+};
+
+// Шаблонная функция, использующая концепты
+template <typename T, typename H>
+    requires hash::HashType<T> && hash::Hasher<T, H>
+void processHash(T data, H hasher)
+{
+    auto hashedData = hasher.hash(data);
+    std::cout << "Data hashed successfully using algorithm: " << static_cast<int>(hasher.getAlgorithm()) << std::endl;
+}
+
 int main(int argc, char *argv[])
 {
+    MyData data("Hello, World!");
+    MyHasher<MyData> hasher;
+
+    processHash(data, hasher); // Используем функцию с хешером и данными
+
+    // MyData1 data1("Hello, World!");
+    // MyHasher<MyData1> hasher1; // the required expression ‘t.size()’ is invalid
+
+    // MyData data1("Hello, World!");
+    // MyHasher1<MyData> hasher1;
+
+    // processHash(data, hasher1); // the required expression ‘h.getAlgorithm()’ is invalid
+
+    //    fu();
     // proccess p{};
     // if (p.arg.parse(argc, argv) != 0)
     // {

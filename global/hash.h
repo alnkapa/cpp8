@@ -1,10 +1,10 @@
 #ifndef GLOBAL_H
 #define GLOBAL_H
 #include <concepts>
+#include <cstddef>
 
 namespace hash
 {
-// Перечисление для алгоритмов хеширования
 enum class Algorithm
 {
     SHA256,
@@ -14,15 +14,23 @@ enum class Algorithm
 };
 
 template <typename T>
-concept HashType = requires(T a) {
-    { a.size() } -> std::convertible_to<std::size_t>;
-    { a.data() } -> std::convertible_to<unsigned char *>;
+concept HashType = requires(T t) {
+    {
+        t.size()
+    } -> std::convertible_to<std::size_t>;
+    {
+        t.data()
+    } -> std::convertible_to<const unsigned char *>;
 };
 
-template <typename T, typename U>
-concept Hash = HashType<U> && requires(T a, U b) {
-    { a.hash() } -> std::convertible_to<U>;
-    { a.getAlgorithm() } -> std::convertible_to<Algorithm>;
+template <typename T, typename H>
+concept Hasher = HashType<T> && requires(const T &t, H h) {
+    {
+        h.hash(t)
+    } -> std::convertible_to<T>;
+    {
+        h.getAlgorithm()
+    } -> std::convertible_to<Algorithm>;
 };
 
 } // namespace hash
