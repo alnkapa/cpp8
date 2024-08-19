@@ -1,20 +1,30 @@
 #ifndef GLOBAL_H
 #define GLOBAL_H
-#include <string>
+#include <concepts>
 
-namespace hash {
-    // Перечисление для алгоритмов хеширования
-    enum class Algorithm { SHA256, MD5, SHA1, CRC32 };
+namespace hash
+{
+// Перечисление для алгоритмов хеширования
+enum class Algorithm
+{
+    SHA256,
+    MD5,
+    SHA1,
+    CRC32
+};
 
-    // тип данных для хранения принимаемого и передаваемого значения
-    using HashType = std::string;
+template <typename T>
+concept HashType = requires(T a) {
+    { a.size() } -> std::convertible_to<std::size_t>;
+    { a.data() } -> std::convertible_to<unsigned char *>;
+};
 
-    class Hash {
-       public:
-        virtual HashType hash(const HashType&) = 0;
-        virtual hash::Algorithm getAlgorithm() const = 0;
-        virtual ~Hash() {};
-    };
-}  // namespace hash
+template <typename T, typename U>
+concept Hash = HashType<U> && requires(T a, U b) {
+    { a.hash() } -> std::convertible_to<U>;
+    { a.getAlgorithm() } -> std::convertible_to<Algorithm>;
+};
 
-#endif  // GLOBAL_H
+} // namespace hash
+
+#endif // GLOBAL_H

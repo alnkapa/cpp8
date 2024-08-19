@@ -5,8 +5,10 @@ add_library(
     hashing 
     STATIC    
     hash.h
+    hash_type.h
     hash.cpp
-    crc32.cpp
+    hash_type.cpp
+    crc32.cpp    
 )
 
 target_include_directories(
