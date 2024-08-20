@@ -11,7 +11,7 @@
 // #include "argc/argc.h"
 // #include "files/files.h"
 #include "global/hash.h"
-// #include "hashing/hash.h"
+#include "hashing/hash.h"
 
 using namespace boost::multi_index;
 using DirectoryException = std::unordered_set<std::string>;
@@ -211,7 +211,7 @@ class MyData
     {
     }
 
-    MyData(const unsigned char *, std::size_t)  
+    MyData(const unsigned char *, std::size_t)
     {
     }
 
@@ -262,8 +262,7 @@ class MyHasher
         data.data();
         size_t block_size{10};
         unsigned char buf[block_size]{0};
-
-        return T{&buf, block_size};
+        return {reinterpret_cast<const unsigned char *>(&buf), block_size};
     }
 
     hash::Algorithm getAlgorithm() const

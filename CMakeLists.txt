@@ -10,7 +10,7 @@ add_executable(bayan main.cpp)
 
 # add_subdirectory(argc)
 add_subdirectory(global)
-# add_subdirectory(hashing)
+add_subdirectory(hashing)
 # add_subdirectory(files)
 
 target_link_libraries(
@@ -18,7 +18,7 @@ target_link_libraries(
     PRIVATE
     global
     # argc
-    # hashing
+    hashing
     # files
 )
 

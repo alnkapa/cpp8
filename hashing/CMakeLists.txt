@@ -7,7 +7,6 @@ add_library(
     hash.h
     hash_type.h
     hash.cpp
-    hash_type.cpp
     crc32.cpp    
 )
 
