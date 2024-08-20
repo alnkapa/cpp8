@@ -3,16 +3,12 @@ cmake_minimum_required(VERSION 3.25.1)
 
 add_library(
     hashing 
-    STATIC    
-    hash.h
-    hash_type.h
-    hash.cpp
-    crc32.cpp    
+    INTERFACE
 )
 
 target_include_directories(
     hashing 
-    PUBLIC
+    INTERFACE
     ${CMAKE_SOURCE_DIR}
 )
 
@@ -20,7 +16,7 @@ find_package(OpenSSL REQUIRED)
 
 target_link_libraries(
     hashing
-    PRIVATE
+    INTERFACE
     OpenSSL::SSL 
     OpenSSL::Crypto
 )

@@ -8,16 +8,21 @@
 
 namespace files
 {
-using Block_t = ::hash::HashType;
-using BlockVector = std::vector<Block_t>;
+
+template <typename T>
+    requires hash::HashType<T>
 class File
 {
+  public:
+    using block_type = T;
+    using vector_type = std::vector<block_type>;
+
   private:
     std::string m_path{};           // путь до файла
     std::uintmax_t m_file_size{0};  // размер файла
     std::size_t m_block_size{0};    // размер блока
     std::size_t m_block_numbers{0}; //  количество блоков
-    BlockVector m_blocks{};         // массив блоков в файле
+    vector_type m_blocks{};         // массив блоков в файле
   public:
     explicit File(const std::string &path,
                   const std::uintmax_t &file_size,
@@ -33,13 +38,13 @@ class File
     std::string &path() noexcept;
 
     // получить хеш
-    const Block_t &get_block(std::size_t num) const noexcept;
+    const block_type &get_block(std::size_t num) const noexcept;
     // получить хеш
-    Block_t &block(std::size_t num) noexcept;
+    block_type &block(std::size_t num) noexcept;
     // есть ли хеш
     bool is_block(std::size_t num) const noexcept;
     // добавить хеш
-    void add_block(Block_t &block, std::size_t num) noexcept;
+    void add_block(block_type &block, std::size_t num) noexcept;
 };
 
 } // namespace files
