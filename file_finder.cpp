@@ -11,7 +11,6 @@
 // #include <unordered_set>
 // #include <iostream>
 
-
 template <typename T>
 void proccess<T>::file_finder(const std::string &path, std::shared_ptr<DirectoryException> directory_exception)
 {
@@ -41,4 +40,12 @@ void proccess<T>::file_finder(const std::string &path, std::shared_ptr<Directory
 template <typename T>
 void proccess<T>::file_cmp(const std::string &path, std::uintmax_t file_size, std::size_t block_size)
 {
+    auto &file_size_index = container.get<1>();
+    auto file_size_range_it = file_size_index.equal_range(file_size);
+    if (file_size_range_it.first == file_size_range_it.second)
+    {
+        // совпадений по размеру не найдено
+        return;
+    }
+
 }

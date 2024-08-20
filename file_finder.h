@@ -14,8 +14,7 @@
 using namespace boost::multi_index;
 using DirectoryException = std::unordered_set<std::string>;
 
-template <typename T>
-struct file_extractor
+template <typename T> struct file_extractor
 {
     typedef std::string result_type;
     const result_type &operator()(const files::File<T> &e) const
@@ -27,8 +26,7 @@ struct file_extractor
         return e->path();
     }
 };
-template <typename T>
-struct file_size_extractor
+template <typename T> struct file_size_extractor
 {
     typedef std::uintmax_t result_type;
     const result_type &operator()(const files::File<T> &e) const
@@ -52,7 +50,7 @@ inline std::size_t get_block_number(std::uintmax_t file_size, std::size_t block_
 }
 
 template <typename T>
- requires hash::HashType<T>
+    requires hash::HashType<T>
 struct proccess
 {
     // clang-format off
@@ -60,8 +58,9 @@ struct proccess
         files::File<T>,
         indexed_by<hashed_unique<file_extractor<T>>, // поиск файла
         ordered_non_unique<file_size_extractor<T>>   // поиск размера
-    >> container;
+    >> container_t;    
     // clang-format on                                         
+    container_t<T> container;
     // хеш функция
     std::unique_ptr<hash::HasherBase<T>> h_fu;
     // параметры запуска
