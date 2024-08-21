@@ -58,7 +58,6 @@ bool proccess::block_cmp(const std::string &path1, const std::string &path2, std
     }
     for (std::size_t b_num = 0; b_num < block_number; ++b_num)
     {
-        std::cout << "BLOCK: " << b_num << "\n";
         if (!file_name_it->is_block(b_num))
         {
             file_index.modify(file_name_it, BlockSave(b_num, block_hash(path1, b_num)));
@@ -76,27 +75,40 @@ bool proccess::block_cmp(const std::string &path1, const std::string &path2, std
             // блоки не совпали
             return false;
         }
+        std::cout << "BLOCK: " << b_num << " OK " << "\n";
     }
     return true;
 }
 
 void proccess::file_cmp(const std::string &path, std::uintmax_t file_size)
 {
+    m_blocks_path1.clear();
     // найти похожие файлы по размеру
     auto &file_size_index = container.get<1>();
     auto file_size_range_it = file_size_index.equal_range(file_size);
     if (file_size_range_it.first == file_size_range_it.second)
     {
-        // TODO: добавить в индекс сравниваемый файл
         // совпадений по размеру не найдено
+        container.emplace(path, file_size, std::move(m_blocks_path1));
         return;
     }
-    std::cout << "COMP1: File: " << path << ", Size: " << file_size << "\n";
-    m_blocks_path1.clear();
+    std::cout << "COMP1: File: " << path << ", Size: " << file_size << "\n";    
+    bool is_find = false;
     for (auto &file_size_it = file_size_range_it.first; file_size_it != file_size_range_it.second; ++file_size_it)
     {
         std::cout << "COMP2: File: " << file_size_it->path << ", Size: " << file_size_it->size << "\n";
         // TODO: parallel ?
-        block_cmp(path, file_size_it->path, file_size);
+        if (block_cmp(path, file_size_it->path, file_size))
+        {
+            // найдено совпадение
+            std::cout << " File: " << file_size_it->path << " File: " << path << " Compare \n";
+            is_find = true;
+            break;
+        }
+    }
+    if (!is_find)
+    {
+        // совпадений по блокам не найдено
+        container.emplace(path, file_size, std::move(m_blocks_path1));
     }
 }

@@ -17,12 +17,10 @@ class File
   private:
     std::vector<hash::HashTypeImpl> m_blocks{}; // массив блоков в файле
   public:
-    // explicit File(const std::string &path,
-    //               const std::uintmax_t &file_size,
-    //               const std::size_t &block_size,
-    //               const std::size_t &block_numbers);
+    explicit File(const std::string &path, const std::uintmax_t &size, std::vector<hash::HashTypeImpl> &&blocks)
+        : path(path), size(size), m_blocks(std::move(blocks)) {};
 
-    // получить хеш    
+    // получить хеш
     const hash::HashTypeImpl &operator[](std::size_t num) const noexcept
     {
         return m_blocks[num];
