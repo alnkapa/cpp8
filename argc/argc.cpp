@@ -20,7 +20,7 @@ namespace arg {
         )
         (
             "directory,d", 
-            po::value<std::vector<std::string>>(&directory),
+            po::value<std::vector<std::string>>(&directory)->required(),
             "input directory (for multiples input use -d dir1 -d dir2 -d dir3 ...)"
         )
         (
@@ -72,19 +72,19 @@ namespace arg {
             return -1;
         }
         // Выводим значения аргументов
-        std::cout << "Input directories: ";
-        std::copy(directory.begin(), directory.end(), std::ostream_iterator<std::string>(std::cout, " "));
-        std::cout << "\n";
-        if (!directory_exception.empty()) {
-            std::cout << "Exception directories: ";
-            std::copy(directory_exception.begin(), directory_exception.end(),
-                      std::ostream_iterator<std::string>(std::cout, " "));
-        }
-        std::cout << "\n";
-        std::cout << "Level: " << deep_level << "\n";
-        std::cout << "Size: " << file_size << "\n";
-        std::cout << "Block size: " << block_size << "\n";
-        std::cout << "Hash algorithm: " << boost::lexical_cast<std::string>(hashes) << "\n";
+        // std::cout << "Input directories: ";
+        // std::copy(directory.begin(), directory.end(), std::ostream_iterator<std::string>(std::cout, " "));
+        // std::cout << "\n";
+        // if (!directory_exception.empty()) {
+        //     std::cout << "Exception directories: ";
+        //     std::copy(directory_exception.begin(), directory_exception.end(),
+        //               std::ostream_iterator<std::string>(std::cout, " "));
+        // }
+        // std::cout << "\n";
+        // std::cout << "Level: " << deep_level << "\n";
+        // std::cout << "Size: " << file_size << "\n";
+        // std::cout << "Block size: " << block_size << "\n";
+        // std::cout << "Hash algorithm: " << boost::lexical_cast<std::string>(hashes) << "\n";
         return 0;
     };
 };  // namespace arg

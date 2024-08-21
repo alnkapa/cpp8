@@ -14,6 +14,7 @@ class File
     std::string path{};     // путь до файла
   private:
     std::vector<hash::HashTypeImpl> m_blocks{}; // массив блоков в файле
+    std::vector<std::string> m_paths{};         // массив идентичных файлов
   public:
     explicit File(const std::string &path, const std::uintmax_t &size, std::vector<hash::HashTypeImpl> &&blocks)
         : path(path), size(size), m_blocks(std::move(blocks)) {};
@@ -36,6 +37,14 @@ class File
             m_blocks.resize(num + 1);
         }
         return m_blocks.at(num);
+    };
+    const std::vector<std::string> &paths() const
+    {
+        return m_paths;
+    };
+    void push_paths(const std::string &in)
+    {
+        m_paths.push_back(in);
     };
 };
 

@@ -5,6 +5,7 @@
 
 int main(int argc, char *argv[])
 {
+    namespace fs = std::filesystem;
     // параметры запуска
     arg::Argc arg;
     if (arg.parse(argc, argv) != 0)
@@ -17,8 +18,8 @@ int main(int argc, char *argv[])
     dir_except->rehash(dir_except->size());
 
     // DEBUG
-    arg.directory.emplace_back("/home/sasha/Documents/1");
-    arg.directory.emplace_back("/home/sasha/Documents/1");
+    // arg.directory.emplace_back("/home/sasha/Documents/1");
+    // arg.directory.emplace_back("/home/sasha/Documents/1");
     // DEBUG
 
     proccess p{arg.block_size, arg.hashes};
@@ -29,7 +30,6 @@ int main(int argc, char *argv[])
                               // TODO: thread - may be
                               try
                               {
-                                  namespace fs = std::filesystem;
                                   fs::path dir(v);
                                   for (auto dir_it = fs::recursive_directory_iterator(dir);
                                        dir_it != fs::recursive_directory_iterator();
@@ -66,5 +66,6 @@ int main(int argc, char *argv[])
                                   std::cout << "Uncaught exception error \n";
                               };
                           });
+    p.print_result();
     return EXIT_SUCCESS;
 }

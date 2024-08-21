@@ -45,6 +45,8 @@ class proccess
     };
     // выбрать из индекса файлы одинаковые по размеру
     void file_cmp(const std::string &path, std::uintmax_t file_size);
+    // результат
+    void print_result();
 };
 
 #endif

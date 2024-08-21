@@ -28,6 +28,21 @@ struct BlockSave
     hash::HashTypeImpl m_value;
 };
 
+struct FileSave
+{
+    FileSave(const std::string &value) : m_value(value)
+    {
+    }
+
+    void operator()(files::File &e)
+    {
+        e.push_paths(m_value);
+    }
+
+  private:
+    std::string m_value;
+};
+
 hash::HashTypeImpl proccess::block_hash(const std::string &path, const size_t b_num)
 {
     auto file = std::fstream(path, std::ios::in | std::ios::binary);
@@ -83,7 +98,6 @@ bool proccess::block_cmp(const std::string &path1, const std::string &path2, std
             return false;
         }
     }
-    std::cout << "BLOCKS: " << block_number << " OK " << "\n";
     return true;
 }
 
@@ -99,17 +113,15 @@ void proccess::file_cmp(const std::string &path, std::uintmax_t file_size)
         container.emplace(path, file_size, std::move(m_blocks_path1));
         return;
     }
-    std::cout << "COMP1: File: " << path << ", Size: " << file_size << "\n";
     bool is_find = false;
     for (auto &file_size_it = file_size_range_it.first; file_size_it != file_size_range_it.second; ++file_size_it)
     {
-        std::cout << "COMP2: File: " << file_size_it->path << ", Size: " << file_size_it->size << "\n";
         // TODO: parallel ?
         if (block_cmp(path, file_size_it->path, file_size))
         {
             // найдено совпадение
-            std::cout << " File: " << file_size_it->path << " File: " << path << " Compare \n";
             is_find = true;
+            file_size_index.modify(file_size_it, FileSave(path));
             break;
         }
     }
@@ -117,5 +129,23 @@ void proccess::file_cmp(const std::string &path, std::uintmax_t file_size)
     {
         // совпадений по блокам не найдено
         container.emplace(path, file_size, std::move(m_blocks_path1));
+    }
+}
+
+void proccess::print_result()
+{
+    auto &file_index = container.get<0>();
+    for (auto file_it = file_index.begin(); file_it != file_index.end(); ++file_it)
+    {        
+        auto same = file_it->paths();
+        if (!same.empty())
+        {
+            std::cout << file_it->path << "\n";
+            for (const auto &v : same)
+            {
+                std::cout << v << "\n";
+            }
+            std::cout << "\n";
+        }
     }
 }
