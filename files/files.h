@@ -1,7 +1,5 @@
 #ifndef BLOCK_H
 #define BLOCK_H
-#include <memory>
-#include <optional>
 #include <vector>
 
 #include "../hashing/hash_type.h"
@@ -21,26 +19,23 @@ class File
         : path(path), size(size), m_blocks(std::move(blocks)) {};
 
     // получить хеш
-    const hash::HashTypeImpl &operator[](std::size_t num) const noexcept
+    const hash::HashTypeImpl &at(std::size_t num) const
     {
-        return m_blocks[num];
+        return m_blocks.at(num);
     };
-    // есть ли хеш
-    bool is_block(std::size_t num) const noexcept
+    // получить хеш
+    hash::HashTypeImpl &at(std::size_t num)
     {
+        // TODO : at double call
         try
         {
             m_blocks.at(num);
-            return true;
         }
         catch (const std::out_of_range &ex)
         {
+            m_blocks.resize(num + 1);
         }
-        return false;
-    };
-    // добавить хеш
-    void assign(std::size_t num, const hash::HashTypeImpl &block) noexcept {
-
+        return m_blocks.at(num);
     };
 };
 

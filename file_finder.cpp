@@ -1,7 +1,6 @@
 #include "file_finder.h"
 #include <iostream>
 #include <fstream>
-#include <memory>
 
 inline std::size_t get_block_number(std::uintmax_t file_size, std::size_t block_size) noexcept
 {
@@ -21,7 +20,7 @@ struct BlockSave
 
     void operator()(files::File &e)
     {
-        e.assign(m_index, m_value);
+        e.at(m_index) = m_value;
     }
 
   private:
@@ -58,25 +57,33 @@ bool proccess::block_cmp(const std::string &path1, const std::string &path2, std
     }
     for (std::size_t b_num = 0; b_num < block_number; ++b_num)
     {
-        if (!file_name_it->is_block(b_num))
-        {
-            file_index.modify(file_name_it, BlockSave(b_num, block_hash(path1, b_num)));
-        }
         try
         {
             m_blocks_path1.at(b_num);
         }
         catch (const std::out_of_range &ex)
         {
-            m_blocks_path1.assign(b_num, block_hash(path1, b_num));
+            m_blocks_path1.resize(b_num + 1);
+            m_blocks_path1.at(b_num) = block_hash(path1, b_num);
         }
-        if (m_blocks_path1[b_num] != (*file_name_it)[b_num])
+
+        try
+        {
+            file_name_it->at(b_num);
+        }
+        catch (const std::out_of_range &ex)
+        {
+            file_index.modify(file_name_it, BlockSave(b_num, block_hash(path1, b_num)));
+        }
+
+        // TODO : at double call
+        if (m_blocks_path1.at(b_num) != file_name_it->at(b_num))
         {
             // блоки не совпали
             return false;
         }
-        std::cout << "BLOCK: " << b_num << " OK " << "\n";
     }
+    std::cout << "BLOCKS: " << block_number << " OK " << "\n";
     return true;
 }
 
@@ -92,7 +99,7 @@ void proccess::file_cmp(const std::string &path, std::uintmax_t file_size)
         container.emplace(path, file_size, std::move(m_blocks_path1));
         return;
     }
-    std::cout << "COMP1: File: " << path << ", Size: " << file_size << "\n";    
+    std::cout << "COMP1: File: " << path << ", Size: " << file_size << "\n";
     bool is_find = false;
     for (auto &file_size_it = file_size_range_it.first; file_size_it != file_size_range_it.second; ++file_size_it)
     {

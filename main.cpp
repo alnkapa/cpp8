@@ -57,9 +57,13 @@ int main(int argc, char *argv[])
                               {
                                   std::cout << "what():  " << ex.what() << '\n';
                               }
+                              catch (const std::exception &ex)
+                              {
+                                  std::cout << "what():  " << ex.what() << '\n';
+                              }
                               catch (...)
                               {
-                                  std::cout << "error: \n";
+                                  std::cout << "Uncaught exception error \n";
                               };
                           });
     return EXIT_SUCCESS;
