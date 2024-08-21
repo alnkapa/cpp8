@@ -4,47 +4,46 @@
 #include <optional>
 #include <vector>
 
-#include "../global/hash.h"
+#include "../hashing/hash_type.h"
 
 namespace files
 {
 
-template <typename T>
-    requires hash::HashType<T>
 class File
 {
   public:
-    using block_type = T;
-    using vector_type = std::vector<block_type>;
-
+    std::uintmax_t size{0}; // размер файла
+    std::string path{};     // путь до файла
   private:
-    std::string m_path{};           // путь до файла
-    std::uintmax_t m_file_size{0};  // размер файла
-    std::size_t m_block_size{0};    // размер блока
-    std::size_t m_block_numbers{0}; //  количество блоков
-    vector_type m_blocks{};         // массив блоков в файле
+    std::vector<hash::HashTypeImpl> m_blocks{}; // массив блоков в файле
   public:
-    explicit File(const std::string &path,
-                  const std::uintmax_t &file_size,
-                  const std::size_t &block_size,
-                  const std::size_t &block_numbers);
-    // размер файла
-    const std::uintmax_t &get_file_size() const noexcept;
-    // размер файла
-    std::uintmax_t &file_size() noexcept;
-    // путь до файла
-    const std::string &get_path() const noexcept;
-    // путь до файла
-    std::string &path() noexcept;
+    // explicit File(const std::string &path,
+    //               const std::uintmax_t &file_size,
+    //               const std::size_t &block_size,
+    //               const std::size_t &block_numbers);
 
-    // получить хеш
-    const block_type &get_block(std::size_t num) const noexcept;
-    // получить хеш
-    block_type &block(std::size_t num) noexcept;
+    // получить хеш    
+    const hash::HashTypeImpl &operator[](std::size_t num) const noexcept
+    {
+        return m_blocks[num];
+    };
     // есть ли хеш
-    bool is_block(std::size_t num) const noexcept;
+    bool is_block(std::size_t num) const noexcept
+    {
+        try
+        {
+            m_blocks.at(num);
+            return true;
+        }
+        catch (const std::out_of_range &ex)
+        {
+        }
+        return false;
+    };
     // добавить хеш
-    void add_block(block_type &block, std::size_t num) noexcept;
+    void assign(std::size_t num, const hash::HashTypeImpl &block) noexcept {
+
+    };
 };
 
 } // namespace files

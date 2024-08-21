@@ -16,7 +16,8 @@ namespace files
 //     m_blocks.reserve(m_block_size);
 // }
 
-// const std::uintmax_t &File::get_file_size() const noexcept
+// template <typename T>
+// const std::uintmax_t &File<T>::get_file_size() const noexcept
 // {
 //     return m_file_size;
 // }

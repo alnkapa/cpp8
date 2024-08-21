@@ -6,7 +6,13 @@ set(CMAKE_CXX_EXTENSIONS OFF)  # Отключите расширения ком�
 
 project(Bayan VERSION 0.0.1)
 
-add_executable(bayan file_finder.h file_finder.cpp main.cpp)
+add_executable(bayan file_finder.cpp main.cpp)
+
+target_include_directories(
+    bayan 
+    PRIVATE
+    ${CMAKE_SOURCE_DIR}
+)
 
 add_subdirectory(argc)
 add_subdirectory(global)
@@ -19,7 +25,7 @@ target_link_libraries(
     global
     argc
     hashing
-    files
+    files    
 )
 
 set(CMAKE_BUILD_TYPE Debug)
