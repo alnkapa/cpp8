@@ -2,6 +2,7 @@
 #include <unordered_set>
 #include "argc/argc.h"
 #include "file_finder.h"
+#include <regex>
 
 int main(int argc, char *argv[])
 {
@@ -17,15 +18,18 @@ int main(int argc, char *argv[])
                           [&dir_except](const std::string &v) noexcept { dir_except->insert(v); });
     dir_except->rehash(dir_except->size());
 
-    // DEBUG
-    // arg.directory.emplace_back("/home/sasha/Documents/1");
-    // arg.directory.emplace_back("/home/sasha/Documents/1");
-    // DEBUG
-
     proccess p{arg.block_size, arg.hashes};
 
+    std::regex re;
+    bool is_re{false};
+    if (!arg.wildcards.empty())
+    {
+        re.assign(arg.wildcards);
+        is_re = true;
+    }
+
     std::ranges::for_each(arg.directory,
-                          [&dir_except, &p, &arg](const std::string &v) noexcept
+                          [&dir_except, &p, &arg, &re, is_re](const std::string &v) noexcept
                           {
                               // TODO: thread - may be
                               try
@@ -49,6 +53,13 @@ int main(int argc, char *argv[])
                                       }
                                       else if (dir_it->is_regular_file() && dir_it->file_size() >= arg.file_size)
                                       {
+                                          if (is_re)
+                                          {
+                                              if (!std::regex_match(dir_it->path().filename().string(), re))
+                                              {
+                                                  continue;
+                                              }
+                                          }
                                           p.file_cmp(dir_it->path(), dir_it->file_size());
                                       }
                                   }
